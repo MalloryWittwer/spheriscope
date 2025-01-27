@@ -1,6 +1,6 @@
 {
-  "short_name": "Embedding visualizer",
-  "name": "Create VAE explorer app",
+  "short_name": "Spheriscope",
+  "name": "Create Spheriscope app",
   "icons": [
     {
       "src": "favicon.ico",

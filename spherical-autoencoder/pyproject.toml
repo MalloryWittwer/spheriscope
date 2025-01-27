@@ -42,9 +42,6 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-"*" = ["*.yaml"]
-
 [tool.setuptools_scm]
 write_to = "src/spherical_autoencoder/_version.py"
 version_scheme = "guess-next-dev"
