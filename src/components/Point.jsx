@@ -3,16 +3,23 @@ import React, { Component } from "react";
 
 class Point extends Component {
   handleMouseEnter = (e) => {
-    const { yPos, xPos, size, id, actionFnct } = this.props;
+    const { id, yPos, xPos, size, actionFnct } = this.props;
     e.preventDefault();
     e.currentTarget.classList.add("hovered-point");
+
     actionFnct(id);
-    const micro = document.getElementById("tooltip");
-    micro.classList.remove("invisible");
-    micro.style.top = `${Number.parseInt(yPos, 10) - 220 - size / 2}px`;
-    micro.style.left = `${Number.parseInt(xPos, 10) - 102}px`;
+
+    const tooltip = document.getElementById("tooltip");
+    if (tooltip != null) {
+      tooltip.classList.remove("invisible");
+      tooltip.style.top = `${Number.parseInt(yPos, 10) - 220 - size / 2}px`;
+      tooltip.style.left = `${Number.parseInt(xPos, 10) - 102}px`;
+    }
+
     const triangle = document.getElementById("triangle");
-    triangle.style.borderTopColor = '#282c34';
+    if (triangle != null) {
+      triangle.style.borderTopColor = "#282c34";
+    }
   };
 
   handleMouseLeave = (e) => {
@@ -22,11 +29,11 @@ class Point extends Component {
   };
 
   render = () => {
-    const { id, yPos, xPos, size, dataset } = this.props;
+    const { yPos, xPos, size, thumbnail } = this.props;
+    const imageUrl = `data:image/png;base64,${thumbnail}`;
     return (
       <div
         className="point"
-        id={id}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
         style={{
@@ -35,7 +42,7 @@ class Point extends Component {
           width: `${size}px`,
           height: `${size}px`,
           fontSize: `${0.5 * size}px`,
-          backgroundImage: `url(${process.env.PUBLIC_URL}/datasets/${dataset}/images/${id}.png)`,
+          backgroundImage: `url(${imageUrl})`,
         }}
       ></div>
     );

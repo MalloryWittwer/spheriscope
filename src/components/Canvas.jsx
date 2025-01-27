@@ -1,72 +1,75 @@
 import React, { Component } from "react";
 import Point from "./Point";
 import Tooltip from "./Tooltip";
-import PointGenerated from "./PointGenerated";
 
 class Canvas extends Component {
   constructor(props) {
     super(props);
-    this.state = { activeID: 0 };
+    this.state = { toolTipImageUrl: null };
   }
 
   keyPressListener = (e) => {
-    if (e.code === 'ControlLeft') {
-      document.getElementById('canvas').style.cursor = 'crosshair';
+    if (e.code === "ControlLeft") {
+      document.getElementById("canvas").style.cursor = "crosshair";
     }
   };
 
   keyUpListener = (e) => {
-    document.getElementById('canvas').style.cursor = 'grab';
-  }
+    document.getElementById("canvas").style.cursor = "grab";
+  };
 
   handleMouseEnter = (e) => {
-    document.addEventListener('keydown', this.keyPressListener);
-    document.addEventListener('keyup', this.keyUpListener);
+    document.addEventListener("keydown", this.keyPressListener);
+    document.addEventListener("keyup", this.keyUpListener);
   };
 
   handleMouseLeave = (e) => {
-    document.removeEventListener('keydown', this.keyPressListener);
-    document.removeEventListener('keyup', this.keyUpListener);
+    document.removeEventListener("keydown", this.keyPressListener);
+    document.removeEventListener("keyup", this.keyUpListener);
   };
 
-  centerOnID = (activeID) => {
-    this.setState({ activeID });
+  fetchToolTipImage = async (imageID) => {
+    if (!imageID) {
+      return;
+    }
+    fetch(`http://localhost:8000/images/${imageID}`)
+      .then((r) => r.json())
+      .then((content) => {
+        const imageUrl = `data:image/png;base64,${content.image}`;
+        this.setState({ toolTipImageUrl: imageUrl });
+      });
+  };
+
+  setToolTipImageID = (toolTipImageID) => {
+    const toolTipImageUrl = this.fetchToolTipImage(toolTipImageID);
+    this.setState({ toolTipImageUrl });
   };
 
   render() {
-    const { dataset, pointSize, children, imageTag, generatedChild } =
-      this.props;
-    const { activeID } = this.state;
-    if (children) {
-      const { xPosGenerated, yPosGenerated } = generatedChild;
+    const { pointSize, pointDataCanvas } = this.props;
+    const { toolTipImageUrl } = this.state;
+    if (pointDataCanvas) {
       return (
-        <div 
+        <div
           id="canvas"
           onMouseEnter={this.handleMouseEnter}
           onMouseLeave={this.handleMouseLeave}
         >
-          {children.map((child) => {
-            const { id, posX, posY, zIndex } = child;
+          {pointDataCanvas.map((pointData) => {
+            const { id, xResized, yResized, thumbnail } = pointData;
             return (
               <Point
-                actionFnct={this.centerOnID}
+                actionFnct={this.setToolTipImageID}
                 key={id}
-                id={id}
-                xPos={posX}
-                yPos={posY}
+                xPos={xResized}
+                yPos={yResized}
                 size={pointSize}
-                zIndex={zIndex}
-                dataset={dataset}
+                id={id}
+                thumbnail={thumbnail}
               />
             );
           })}
-          <Tooltip filename={activeID} dataset={dataset} />
-          <PointGenerated
-            innerHTML={imageTag}
-            xPos={xPosGenerated}
-            yPos={yPosGenerated}
-            size={pointSize}
-          />
+          <Tooltip imageURL={toolTipImageUrl} />
         </div>
       );
     } else {

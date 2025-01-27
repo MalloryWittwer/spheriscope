@@ -1,13 +1,20 @@
 import "./tooltip.css";
+import React, { Component } from "react";
 
-export default function Tooltip(props) {
-  return (
-    <div className="tooltip invisible" id="tooltip">
-      <img
-        src={`${process.env.PUBLIC_URL}/datasets/${props.dataset}/images/${props.filename}.png`}
-        alt="tooltip"
-      />
-      <div id="triangle"></div>
-    </div>
-  );
+class Tooltip extends Component {
+  render() {
+    const { imageURL } = this.props;
+    if (imageURL) {
+      return (
+        <div className="tooltip invisible" id="tooltip">
+          <img src={`${imageURL}`} alt="tooltip" />
+          <div id="triangle"></div>
+        </div>
+      );
+    } else {
+      return <div></div>;
+    }
+  }
 }
+
+export default Tooltip;

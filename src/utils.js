@@ -46,12 +46,21 @@ const orthoProjection = (tp) => {
   let [t, p] = tp;
   const t0 = 0;
   const tshifted = t + Math.PI / 2;
-  const cosC =
-    Math.sin(t0) * Math.sin(tshifted) +
-    Math.cos(t0) * Math.cos(tshifted) * Math.cos(p);
-  if (cosC < 0) {
-    return [10000, 10000]; // Outside of view
-  }
+  // const tshifted = t;
+
+  // const cosC =
+  //   Math.sin(t0) * Math.sin(tshifted) +
+  //   Math.cos(t0) * Math.cos(tshifted) * Math.cos(p);
+  // if (cosC > 0) {
+  //   return [10000, 10000]; // Outside of view
+  // }
+  // const cosC =
+  //   Math.sin(t0) * Math.sin(tshifted) +
+  //   Math.cos(t0) * Math.cos(tshifted) * Math.cos(p);
+  // if (cosC < 0) {
+  //   return [10000, 10000]; // Outside of view
+  // }
+
   const X = Math.cos(tshifted) * Math.sin(p);
   const Y =
     Math.cos(t0) * Math.sin(tshifted) -
@@ -73,12 +82,12 @@ const invOrthoProjection = (XY) => {
   const c = Math.asin(rho);
   const t =
     Math.asin(
-      Math.cos(c) * Math.sin(t0) + (Y * Math.sin(c) * Math.cos(t0)) / rho
+      Math.cos(c) * Math.sin(t0) + (Y * Math.sin(c) * Math.cos(t0)) / rho,
     ) -
     Math.PI / 2;
   const p = Math.atan(
     ((X * Math.sin(c)) / rho) * Math.cos(c) * Math.cos(t0) -
-      Y * Math.sin(c) * Math.sin(t0)
+    Y * Math.sin(c) * Math.sin(t0),
   );
   return [t, p];
 };

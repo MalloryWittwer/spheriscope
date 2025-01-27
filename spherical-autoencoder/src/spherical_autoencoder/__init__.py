@@ -1,0 +1,2 @@
+from spherical_autoencoder.inference import TrainedSphericalEncoder
+from spherical_autoencoder.model import SphericalAutoencoder

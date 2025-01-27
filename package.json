@@ -1,5 +1,5 @@
 {
-  "name": "embedding-visualizer",
+  "name": "spheriscope",
   "version": "0.1.0",
   "engines": {
     "yarn": "1.22.17",
@@ -20,15 +20,12 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "5.0.0",
-    "react-select": "^5.2.2",
-    "web-vitals": "^2.1.4"
+    "react-select": "^5.2.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start-api": "venv/Scripts/activate && flask run --no-debugger"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +44,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "https://embedding-visualizer.herokuapp.com/"
+  }
 }

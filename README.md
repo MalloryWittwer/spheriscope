@@ -1,29 +1,96 @@
-# Embedding visualizer
+# 🫧 Spheriscope: A Toolbox for Visualizing Images on a Spherical Latent Space
 
-![screenshot](https://github.com/MalloryWittwer/embedding-visualizer/blob/master/screenshots/screenshot.png?raw=true)
+![screenshot](https://github.com/MalloryWittwer/spheriscope/blob/master/screenshots/screenshot.png?raw=true)
 
-This application is a tool to explore and interact with the latent space of a variational autoencoder (VAE) in an intuitive and user-friendly way. Users can "navigate" through the latent space by grabbing and panning the canvas, and generate new points at desired locations. This is made possible by constraining the latent space of the VAE to a unit sphere, which is projected onto the canvas using the orthographic, stereographic, or cylindrical sphere projection. The MNIST and Fashion-MNIST datasets are shown as examples, however, the technique could be applied or adapted to any other dataset.
+**Spheriscope** is a web application designed to explore image datasets projected onto a spherical geometry using autoencoders. Images that are visually similar are positioned close to each other, while dissimilar images are farther apart.
 
-#### Training a VAE with a spherical latent space
+## Components
 
-[Variational autoencoders](https://en.wikipedia.org/wiki/Variational_autoencoder) or VAE are neural networks that attempt to compress the input data into a low-dimensional latent space (encoding) and then reconstruct it as accurately as possible (decoding). Once the model is trained, new data can be generated from the latent space by the decoder model. Here, we have constrained the latent space to lie on the surface of a (three-dimensional) unit sphere. Therefore, the latent space is [closed](https://en.wikipedia.org/wiki/Surface_(topology)#Closed_surfaces); it is compact, without any boundaries. Introducing this constraint facilitates viewing and navigating the latent space in the app.
+This project consists of three main components:
 
-⏬ Below are the loss decrease, some examples of input-reconstruction pairs, and the evolution of the latent space over 60 epochs (colors = MNIST labels):
+- [spherical-autoencoder](./spherical-autoencoder/): A package for training autoencoders with spherical latent spaces.
+- [spheriscope-backend](./spheriscope-backend/): The backend application built with [FastAPI](https://fastapi.tiangolo.com/) and [SQLite](https://www.sqlite.org/).
+- [spheriscope](./): The frontend application built with [React](https://react.dev/).
 
-![animation](https://github.com/MalloryWittwer/embedding-visualizer/blob/master/screenshots/anim_autoencoder.gif?raw=true)
+## Usage
 
-#### Exploring the latent space in a web app
+To use *Spheriscope*, clone the repository and navigate into the project directory:
 
-The app is built with a [React](https://fr.reactjs.org/) frontend and a [Flask](https://flask.palletsprojects.com/en/2.0.x/) backend (to serve newly generated data).
+```sh
+git clone https://github.com/MalloryWittwer/spheriscope.git
+cd spheriscope
+```
 
-Quick tips:
-- Generate new data by holding **Left Ctrl** and right-clicking on the embedding.
-- Use the **mouse wheel** to zoom in and out. 
-- Try different sphere projections (orthographic, stereo, and cylindrical) and let us know your favourite :)
-- **Mobile version**: try the app on a phone screen for a different user experience! 
+### Step 1: Prepare an Image Dataset
 
-#### Contact
+To get started, you need a **dataset of images**. You can use a subset of the [MNIST](https://search.brave.com/search?q=mnist&source=desktop) dataset as an example.
 
-Any questions about this project?
+Ensure that:
 
-=> Send me a 📧 at **mallory.wittwer@gmail.com**.
+- The images can be resized to **64x64 pixels** without losing significant visual quality. The autoencoder operates at this image size. If the images are not already this size, they will be resized internally by the autoencoder.
+- The images are **grayscale** with pixel values between 0 and 255. If the images are in RGB, they will be converted to grayscale.
+
+Save your images in PNG, JPG, or TIF format in a dataset folder. For example:
+
+```
+images/
+├── img1.png
+├── img2.png
+├── ...
+```
+
+### Step 2: Train a Spherical Autoencoder
+
+Follow the [instructions](./spherical-autoencoder/README.md) to install the [spherical-autoencoder](./spherical-autoencoder/) Python package. Then, run the training script:
+
+```sh
+spheriscope train <images_dir> <model_output_dir> --epochs 1000 --batch_size 32
+```
+
+This will save a model file `encoder.keras` in the specified output directory.
+
+### Step 3: Install and Run *Spheriscope*
+
+**Option 1: With Docker**
+
+To install and run *Spheriscope* using [Docker Compose](https://docs.docker.com/compose/), run:
+
+```sh
+docker compose up
+```
+
+This will:
+
+- Install and run the [spheriscope-backend](./spheriscope-backend/) on http://localhost:8000.
+- Install and run the frontend application on http://localhost:3000.
+
+**Option 2: Without Docker**
+
+To install the app without Docker, first install the Python packages listed in [requirements.txt](./spheriscope-backend/requirements.txt). Then, start the backend server on http://localhost:8000 using:
+
+```sh
+uvicorn main:app --port 8000
+```
+
+Next, install the frontend application from the root of the project using `npm install`, and start the app on http://localhost:3000 with:
+
+```sh
+npm start
+```
+
+### Step 4: Load Your Dataset and Visualize It
+
+Once *Spheriscope* is running, use the upload script to project all images from the dataset onto the autoencoder's spherical latent space and load them into the app's SQLite database:
+
+```sh
+spheriscope upload <images_dir> <model_output_dir>
+```
+
+After the command completes, reload the page at http://localhost:3000. You should see the projected image dataset 🎉.
+
+To stop the application, run:
+
+```sh
+docker compose down
+```
+
