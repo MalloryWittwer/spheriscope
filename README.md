@@ -1,7 +1,5 @@
 # 🫧 Spheriscope: A Toolbox for Visualizing Images on a Spherical Latent Space
 
-![screenshot](https://github.com/MalloryWittwer/spheriscope/blob/master/screenshots/screenshot.png?raw=true)
-
 **Spheriscope** is a web application designed to explore image datasets projected onto a spherical geometry using autoencoders. Images that are visually similar are positioned close to each other, while dissimilar images are farther apart.
 
 ## Components

@@ -1,7 +1,5 @@
 # Spherical Autoencoders
 
-![animation](https://github.com/MalloryWittwer/spheriscope/blob/master/screenshots/anim_autoencoder.gif?raw=true)
-
 Autoencoders are neural networks designed to project input data onto a low-dimensional space (the latent space) and then reconstruct it as accurately as possible. This package provides an implementation of an autoencoder with a spherical latent space. This constraint makes it possible to navigate and visualize images projected onto the autoencoder's latent space using the [Spheriscope](../README.md) app.
 
 ## Installation
