@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from spherical_autoencoder import SphericalAutoencoder, TrainedSphericalEncoder
+from spherical_autoencoder import DinoV2SphericalAutoencoder, TrainedDinoV2SphericalEncoder
 import matplotlib.pyplot as plt
 import skimage.io
 import requests
@@ -9,9 +10,7 @@ import requests
 BACKEND_URL = "http://localhost:8000"
 
 
-def train(images_dir, model_output_dir, epochs=1000, batch_size=32):
-    autoencoder = SphericalAutoencoder()
-
+def train(autoencoder, images_dir, model_output_dir, epochs=1000, batch_size=32):
     history = autoencoder.train(images_dir, epochs=epochs, batch_size=batch_size)
 
     fig, ax = plt.subplots(figsize=(12, 10))
@@ -31,16 +30,15 @@ def train(images_dir, model_output_dir, epochs=1000, batch_size=32):
     print(f"Saved {model_path}")
 
 
-def predict(image_file, model_path):
+def predict(encoder, image_file):
     image = skimage.io.imread(image_file)
     print(f"{image.shape=}")
     
-    encoder = TrainedSphericalEncoder(model_path)
     encoded_image = encoder.predict(image)
     print(f"{encoded_image=}")
 
 
-def upload(images_dir, model_path):
+def upload(encoder, images_dir):
     try:
         response = requests.get(BACKEND_URL)
         if response.status_code != 200:
@@ -49,8 +47,6 @@ def upload(images_dir, model_path):
     except requests.exceptions.RequestException as e:
         print(f"Failed to connect to {BACKEND_URL}. Exception: {e}")
         return
-
-    encoder = TrainedSphericalEncoder(model_path)
 
     for image_file in Path(images_dir).iterdir():
         image_file = str(image_file)
@@ -76,27 +72,43 @@ def main():
     subparsers = parser.add_subparsers(dest='command')
 
     train_parser = subparsers.add_parser('train', help='Train the autoencoder')
-    train_parser.add_argument('images_dir', type=str, help='Directory containing images')
-    train_parser.add_argument('model_output_dir', type=str, help='Directory to save the trained model')
+    train_parser.add_argument('images_dir', help='Directory containing images')
+    train_parser.add_argument('model_output_dir', help='Directory to save the trained model')
     train_parser.add_argument('--epochs', type=int, default=1000, help='Number of training epochs')
     train_parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training')
+    train_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='dinov2', help='Model type to use for training')
+    # input_image_size=224, middle_layer_params=16
 
     predict_parser = subparsers.add_parser('predict', help='Predict using the trained autoencoder')
-    predict_parser.add_argument('image_file', type=str, help='Image file to project')
-    predict_parser.add_argument('model_path', type=str, help='Path to the trained model file')
+    predict_parser.add_argument('image_file', help='Image file to project')
+    predict_parser.add_argument('model_path', help='Path to the trained model file')
+    predict_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='dinov2', help='Model type to use for prediction')
     
     upload_parser = subparsers.add_parser('upload', help='Upload images to the backend')
-    upload_parser.add_argument('images_dir', type=str, help='Directory containing images')
-    upload_parser.add_argument('model_path', type=str, help='Path to the trained model file')
+    upload_parser.add_argument('images_dir', help='Directory containing images')
+    upload_parser.add_argument('model_path', help='Path to the trained model file')
+    upload_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='dinov2', help='Model type to use for prediction')
 
     args = parser.parse_args()
 
     if args.command == 'train':
-        train(args.images_dir, args.model_output_dir, args.epochs, args.batch_size)
+        if args.model == "dinov2":
+            autoencoder = DinoV2SphericalAutoencoder()
+        else:
+            autoencoder = SphericalAutoencoder()
+        train(autoencoder, args.images_dir, args.model_output_dir, args.epochs, args.batch_size)
     elif args.command == 'predict':
-        predict(args.image_file, args.model_path)
+        if args.model == "dinov2":
+            encoder = TrainedDinoV2SphericalEncoder(args.model_path)
+        else:
+            encoder = TrainedSphericalEncoder(args.model_path)
+        predict(encoder, args.image_file)
     elif args.command == 'upload':
-        upload(args.images_dir, args.model_path)
+        if args.model == "dinov2":
+            encoder = TrainedDinoV2SphericalEncoder(args.model_path)
+        else:
+            encoder = TrainedSphericalEncoder(args.model_path)
+        upload(encoder, args.images_dir)
     else:
         parser.print_help()
 

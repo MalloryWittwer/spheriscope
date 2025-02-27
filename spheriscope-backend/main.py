@@ -1,7 +1,6 @@
 from typing import List
 from pydantic import BaseModel
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Form
-from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import Column, Integer, LargeBinary, Float, create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,11 +9,12 @@ from PIL import Image
 import io
 from fastapi.responses import JSONResponse
 import base64
+import os
 
+THUMBNAIL_SIZE = int(os.getenv("THUMBNAIL_SIZE", 64))
 
 DATABASE_URL = "sqlite:///./images.db"
 FRONTEND_URL = "http://localhost:3000"
-
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -82,7 +82,7 @@ async def upload_image(
     
     image = Image.open(io.BytesIO(image_data))
 
-    thumbnail = image.resize((16, 16))
+    thumbnail = image.resize((THUMBNAIL_SIZE, THUMBNAIL_SIZE))
 
     output = io.BytesIO()
     thumbnail.save(output, format=image.format)
