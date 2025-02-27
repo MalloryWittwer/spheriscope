@@ -1,3 +1,4 @@
+import os
 import argparse
 from pathlib import Path
 from spherical_autoencoder import SphericalAutoencoder, TrainedSphericalEncoder
@@ -11,6 +12,11 @@ BACKEND_URL = "http://localhost:8000"
 
 
 def train(autoencoder, images_dir, model_output_dir, epochs=1000, batch_size=32):
+    model_output_dir = Path(model_output_dir).resolve()
+    if not model_output_dir.exists():
+        os.makedirs(model_output_dir)
+        print("Created output folder: ", model_output_dir)
+
     history = autoencoder.train(images_dir, epochs=epochs, batch_size=batch_size)
 
     fig, ax = plt.subplots(figsize=(12, 10))
@@ -22,10 +28,10 @@ def train(autoencoder, images_dir, model_output_dir, epochs=1000, batch_size=32)
     ax.set_xlabel("epoch")
     plt.legend()
     plt.tight_layout()
-    plt.savefig(str(Path(model_output_dir) / 'training_loss.png'))
+    plt.savefig(str(model_output_dir / 'training_loss.png'))
     plt.close()
     
-    model_path = str(Path(model_output_dir) / 'encoder.keras')
+    model_path = str(model_output_dir / 'encoder.keras')
     autoencoder.save_encoder(model_path)
     print(f"Saved {model_path}")
 

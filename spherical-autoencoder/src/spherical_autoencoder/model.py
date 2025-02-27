@@ -47,9 +47,7 @@ class SphericalAutoencoder:
     def __init__(self, optimizer="rmsprop"):
         inputs = layers.Input(shape=(None, None, 1))
         resize_layer = layers.Resizing(64, 64)(inputs)  # Images are resized to 64x64px
-        rescale_layer = layers.Rescaling(1.0 / 255)(
-            resize_layer
-        )  # Images are scaled to 0-1
+        rescale_layer = layers.Rescaling(1.0 / 255)(resize_layer)  # Images are scaled to 0-1
 
         x = layers.Conv2D(2, (3, 3), activation="relu", padding="same", strides=4)(
             rescale_layer
