@@ -82,18 +82,17 @@ def main():
     train_parser.add_argument('model_output_dir', help='Directory to save the trained model')
     train_parser.add_argument('--epochs', type=int, default=1000, help='Number of training epochs')
     train_parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training')
-    train_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='dinov2', help='Model type to use for training')
-    # input_image_size=224, middle_layer_params=16
+    train_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='cnn', help='Model type to use for training')
 
     predict_parser = subparsers.add_parser('predict', help='Predict using the trained autoencoder')
     predict_parser.add_argument('image_file', help='Image file to project')
     predict_parser.add_argument('model_path', help='Path to the trained model file')
-    predict_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='dinov2', help='Model type to use for prediction')
+    predict_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='cnn', help='Model type to use for prediction')
     
     upload_parser = subparsers.add_parser('upload', help='Upload images to the backend')
     upload_parser.add_argument('images_dir', help='Directory containing images')
     upload_parser.add_argument('model_path', help='Path to the trained model file')
-    upload_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='dinov2', help='Model type to use for prediction')
+    upload_parser.add_argument('--model', choices=['dinov2', 'cnn'], default='cnn', help='Model type to use for prediction')
 
     args = parser.parse_args()
 

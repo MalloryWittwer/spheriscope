@@ -36,7 +36,7 @@ class DinoV2SphericalAutoencoder:
     ):
         self.processor = AutoImageProcessor.from_pretrained("facebook/dinov2-small")
         self.dinov2_model = AutoModel.from_pretrained("facebook/dinov2-small")
-        self.input_image_size = input_image_size
+        self.input_image_size = input_image_size  # Size at which the images are rescaled before being processed by dinov2
         self.middle_layer_params = middle_layer_params
 
         self.encoder, self.autoencoder = self._create_model()
@@ -44,7 +44,6 @@ class DinoV2SphericalAutoencoder:
         self.autoencoder.compile(
             optimizer=optimizer,
             loss=autoencoder_loss,
-            # loss=variance_loss,
             metrics=[variance_loss, reconstruction_loss],
         )
 
@@ -85,7 +84,7 @@ class DinoV2SphericalAutoencoder:
         outputs = self.dinov2_model(**inputs)
         outputs = outputs.last_hidden_state.cpu().detach().numpy()
 
-        cls_outputs = outputs[:, 0, :]
+        cls_outputs = outputs[:, 0, :]  # Classification features
 
         history = self.autoencoder.fit(
             x=cls_outputs,

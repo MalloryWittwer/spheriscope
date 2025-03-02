@@ -14,11 +14,10 @@ def reconstruction_loss(y_true, outputs):
     return loss
 
 
-def variance_loss(y_true, outputs):
-    z = outputs[:, -3:]
-    var = tf.math.reduce_variance(z, axis=0)  # (3,) - batch varianc along x, y and z
-    loss = 1 / tf.reduce_mean(var)  # (1,) - variance in position in the batch
-    loss = tf.sqrt(loss)
+def variance_loss(y_true, outputs):  # TODO: This loss doesn't seem to have any effect..
+    y_pred = outputs[:, -3:]
+    var = tf.math.reduce_variance(y_pred, axis=0)  # (3,) - batch varianc along x, y and z
+    loss = -tf.reduce_mean(var)  # (1,) - variance in position in the batch
     return loss
 
 
@@ -33,6 +32,7 @@ def unit_vectorize(x):
 
 def load_images_from_folder(folder_path: str) -> np.ndarray:
     image_files = list(Path(folder_path).iterdir())
+    # The images are also converted to grayscale
     X_train = np.array([skimage.io.imread(file, as_gray=True) for file in image_files])
     # Normalize the gray levels to 0-255
     X_train = X_train.astype(np.float64)

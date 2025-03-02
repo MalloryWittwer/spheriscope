@@ -26,6 +26,7 @@ dependencies = [
     "tensorflow",
     "ipython",
     "ipykernel",
+    "transformers",
 ]
 
 [project.urls]

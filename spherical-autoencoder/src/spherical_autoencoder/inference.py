@@ -5,6 +5,13 @@ from transformers import AutoImageProcessor, AutoModel
 from spherical_autoencoder.model import unit_vectorize
 
 
+def cartesian2spherical(cartesian_coords):
+    z, y, x = cartesian_coords
+    theta = float(np.arccos(z))
+    phi = float(np.arctan2(y, x))
+    return theta, phi
+
+
 class TrainedSphericalEncoder:
     def __init__(self, keras_file: str):
         self.encoder = keras.models.load_model(
@@ -16,13 +23,11 @@ class TrainedSphericalEncoder:
         # Add a channel dimension if the images are grayscale
         if len(image.shape) == 2:
             image = np.expand_dims(image[None], -1)
+        
         cartesian_coords = self.encoder.predict(image)
         cartesian_coords = cartesian_coords[0]  # Remove the batch dimension
-        z, y, x = cartesian_coords
-        theta = np.arccos(z)
-        phi = np.arctan2(y, x)
-        theta = float(theta)
-        phi = float(phi)
+
+        theta, phi = cartesian2spherical(cartesian_coords)
         
         return {
             "theta": theta,
@@ -41,21 +46,17 @@ class TrainedDinoV2SphericalEncoder:
         )
 
     def predict(self, image: np.ndarray):
-        
         inputs = self.processor(image, return_tensors="pt")
 
         outputs = self.dinov2_model(**inputs)
         outputs = outputs.last_hidden_state.cpu().detach().numpy()
 
-        cls_outputs = outputs[:, 0, :]
+        cls_outputs = outputs[:, 0, :]  # Classification features
 
         cartesian_coords = self.encoder.predict(cls_outputs)
         cartesian_coords = cartesian_coords[0]  # Remove the batch dimension
-        z, y, x = cartesian_coords
-        theta = np.arccos(z)
-        phi = np.arctan2(y, x)
-        theta = float(theta)
-        phi = float(phi)
+
+        theta, phi = cartesian2spherical(cartesian_coords)
         
         return {
             "theta": theta,
